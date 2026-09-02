@@ -68,4 +68,19 @@ class TaskController extends Controller
 
         return redirect()->route('tasks.index');
     }
+
+    public function apiIndex()
+    {
+        $query = Task::query();
+
+        if (request('search')) {
+            $query->where('title', 'like', '%' . request('search') . '%');
+        }
+
+        if (request('status')) {
+            $query->where('status', request('status'));
+        }
+
+        return $query->get();
+    }
 }
