@@ -83,4 +83,39 @@ class TaskController extends Controller
 
         return $query->get();
     }
+    public function apiStore(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|in:open,in_progress,done',
+            'due_date' => 'nullable|date',
+        ]);
+
+        $task = Task::create($validated);
+
+        return response()->json($task, 201);
+    }
+
+    public function apiUpdate(Request $request, Task $task)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|in:open,in_progress,done',
+            'due_date' => 'nullable|date',
+        ]);
+
+        $task->update($validated);
+
+        return response()->json($task, 200);
+    }
+
+    public function apiDestroy(Task $task)
+    {
+        Task::destroy($task->id);
+
+        return response()->json(null, 204);
+    }
+
 }

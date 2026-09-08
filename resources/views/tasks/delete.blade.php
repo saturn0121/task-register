@@ -2,20 +2,53 @@
 
 @section('content')
 <div class="max-w-md mx-auto p-4">
-<h1 class="text-2xl font-bold mb-4">Delete Task</h1>
+    <h1 class="text-2xl font-bold mb-4">Delete Task</h1>
 
-<form method="POST" action="{{ route('tasks.destroy', $task) }}" class="space-y-4">
-    @csrf
-    @method('DELETE')
-    <input type="text" name="title" placeholder="Title" value="{{ $task->title }}" class="w-full border rounded px-2 py-1">
-    <textarea name="description" placeholder="Description" class="w-full border rounded px-2 py-1">{{ $task->description }}</textarea>
-    <select name="status" class="w-full border rounded px-2 py-1">
-        <option value="open" @selected($task->status == 'open')>Open</option>
-        <option value="in_progress" @selected($task->status == 'in_progress')>In Progress</option>
-        <option value="done" @selected($task->status == 'done')>Done</option>
-    </select>
-    <input type="date" name="due_date" value="{{ $task->due_date }}" class="w-full border rounded px-2 py-1">
-    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete</button>
-</form>
+    <div class="space-y-2 mb-4">
+        <p><span class="font-semibold">Title:</span> {{ $task->title }}</p>
+        <p><span class="font-semibold">Description:</span> {{ $task->description }}</p>
+        <p><span class="font-semibold">Status:</span> {{ $task->status }}</p>
+        <p><span class="font-semibold">Due date:</span> {{ $task->due_date }}</p>
+    </div>
+
+    <p id="deleteError" class="hidden text-red-600 mb-2"></p>
+
+    <button id="confirmDeleteBtn" data-task-id="{{ $task->id }}"
+            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+        Delete
+    </button>
 </div>
+
+<script>
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async function () {
+        const button = this;
+        const taskId = button.dataset.taskId;
+        const errorEl = document.getElementById('deleteError');
+
+        errorEl.classList.add('hidden');
+        button.disabled = true;
+        button.textContent = 'Deleting...';
+
+        try {
+            const response = await fetch(`/api/tasks/${taskId}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                window.location.href = '/tasks';
+                return;
+            }
+
+            errorEl.textContent = `Delete failed (status ${response.status}).`;
+            errorEl.classList.remove('hidden');
+            button.disabled = false;
+            button.textContent = 'Delete';
+        } catch (err) {
+            errorEl.textContent = 'Network error — check your connection and try again.';
+            errorEl.classList.remove('hidden');
+            button.disabled = false;
+            button.textContent = 'Delete';
+        }
+    });
+</script>
 @endsection
