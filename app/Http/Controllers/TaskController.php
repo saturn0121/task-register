@@ -83,6 +83,10 @@ class TaskController extends Controller
 
         return $query->get();
     }
+    public function apiShow(Task $task)
+    {
+        return response()->json($task, 200);
+    }
     public function apiStore(Request $request)
     {
         $validated = $request->validate([
