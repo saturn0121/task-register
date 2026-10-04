@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Task;
+use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller
 {
@@ -117,6 +118,8 @@ class TaskController extends Controller
 
     public function apiDestroy(Task $task)
     {
+        Gate::authorize('delete', $task);
+
         Task::destroy($task->id);
 
         return response()->json(null, 204);
